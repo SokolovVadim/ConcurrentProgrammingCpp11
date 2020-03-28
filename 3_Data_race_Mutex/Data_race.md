@@ -39,3 +39,31 @@ void processf(void fun(ofstream&)){
 	fun(fout); // it can do anything with fout (close, copy etc)
 }
 ```
+## Is this thread safe?
+
+```
+class stack{
+public:
+	// void pop(); // - is not thread safe
+	int pop(); // it is thread safe
+	int top();
+private:
+	int* data;
+	std::mutex _mu;
+}
+
+void func(stack & stk){
+	int v = stk.pop();
+	process(v);
+}
+
+```
+
+## Avoiding data race
+
+
+- Use mutex to syncrhronize data access  
+
+- Never leak a handle of data to outside  
+
+- Design interface appropriately  
