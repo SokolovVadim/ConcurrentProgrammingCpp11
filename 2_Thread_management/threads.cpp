@@ -29,6 +29,11 @@ public:
 
 int main()
 {
+	// oversubscription problem
+
+	std::cout << std::thread::hardware_concurrency() << std::endl; // number of real cores
+
+
 	// Functor fct;
 	// std::thread thread_1(fct);
 	
