@@ -1,5 +1,7 @@
 # Thread management
 Running threads in limited scope  
+## Thread management
+
 - Thread management using wrapper
 
 ```
@@ -14,7 +16,8 @@ public:
 ```
 `std::thread thread_1(Functor())`
 - Thread management using RAII  
-Passing parameter  
+
+## Passing parameter  
 `std::thread thread_1((Functor2()), std::ref(msg));`  
 std::thread does not allow copying  
 therefore move semantics is suitable there  
