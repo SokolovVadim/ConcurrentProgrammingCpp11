@@ -1,5 +1,6 @@
 #include <thread>
 #include <iostream>
+#include <string>
 
 
 void worker(){
@@ -8,7 +9,7 @@ void worker(){
 
 
 // Lambda
-class Functor
+class Functor1
 {
 public:
 	void operator()(){
@@ -17,10 +18,25 @@ public:
 	}
 };
 
+class Functor2
+{
+public:
+	void operator()(std::string msg){
+		std::cout << "t1 says: " << msg << std::endl;
+	}
+};
+
 int main()
 {
-	Functor fct;
-	std::thread thread_1(fct);
+	// Functor fct;
+	// std::thread thread_1(fct);
+	
+	// std::thread thread_1(Functor()); This line isn't compilable
+	// std::thread thread_1((Functor1())); it works
+
+	std::string msg = "Watch out and wash hands";
+	std::thread thread_1((Functor2()), msg);
+
 	// std::thread thread_1(worker); // t1 starts running
 	// using RAII
 	// Wrapper
