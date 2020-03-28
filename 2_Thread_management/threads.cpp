@@ -36,9 +36,15 @@ int main()
 	// std::thread thread_1((Functor1())); it works
 
 	std::string msg = "Watch out and wash hands";
-	std::thread thread_1((Functor2()), std::ref(msg));
 
-	thread_1.join();
+	std::cout << std::this_thread::get_id() << std::endl;
+
+	std::thread thread_1((Functor2()), std::ref(msg));
+	std::cout << thread_1.get_id() << std::endl;
+
+	std::thread thread_2 = std::move(thread_1);
+
+	thread_2.join();
 
 	std::cout << "job from main: " << msg << std::endl;
 
