@@ -21,8 +21,9 @@ public:
 class Functor2
 {
 public:
-	void operator()(std::string msg){
+	void operator()(std::string & msg){
 		std::cout << "t1 says: " << msg << std::endl;
+		msg = "t1 washed up its hands";
 	}
 };
 
@@ -35,18 +36,20 @@ int main()
 	// std::thread thread_1((Functor1())); it works
 
 	std::string msg = "Watch out and wash hands";
-	std::thread thread_1((Functor2()), msg);
+	std::thread thread_1((Functor2()), std::ref(msg));
+
+	thread_1.join();
+
+	std::cout << "job from main: " << msg << std::endl;
 
 	// std::thread thread_1(worker); // t1 starts running
 	// using RAII
 	// Wrapper
-	try{
-		for(int i(0); i < 100; ++i)
-			std::cout << "job from main: " << i << std::endl;
+	/*try{
+		std::cout << "job from main: " << std::endl;
 	} catch(...){
 		thread_1.join();
 		throw;
-	}
-
+	}*/
 	return 0;
 }
