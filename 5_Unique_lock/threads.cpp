@@ -7,36 +7,33 @@
 class LogFile{
 public:
 	LogFile()
-	{
-		fout_.open("log.txt");
-	}
+	{}
 	~LogFile()
 	{
 		fout_.close();
 	}
 	void shared_print(std::string msg, int value)
-	{
-		// std::lock_guard<std::mutex> guard(mutex_);
-		// std::unique_lock<std::mutex> guard(mutex_);
+	{/*
+		if(!fout_.is_open())
+		{
+			std::unique_lock<std::mutex> guard2(mutex_open_);
+			fout_.open("log.txt");
+		}*/
+
+		// file will be opened only once by one thread
+		std::call_once(flag_, [&](){ fout_.open("log.txt"); });
+
 		std::unique_lock<std::mutex> guard(mutex_, std::defer_lock);
-
-		// do smth that doesn't require fout_
-
-		guard.lock();
+		mutex_.lock();
 		fout_ << msg << ": " << value << std::endl;
-		guard.unlock();
-
-		// do smth that doesn't require fout_
-
-		guard.lock();
-
-		std::unique_lock<std::mutex> guard2 = std::move(guard);
-
+		mutex_.unlock();
 	}
 
 private:
-	std::mutex    mutex_;
-	std::ofstream fout_;
+	std::once_flag flag_;
+	// std::mutex    mutex_open_;
+	std::mutex     mutex_;
+	std::ofstream  fout_;
 };
 
 void worker(LogFile & log){
