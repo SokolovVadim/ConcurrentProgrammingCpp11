@@ -4,24 +4,6 @@
 #include <mutex>
 #include <fstream>
 
-
-// std::mutex mtx;
-
-/*void shared_print(std::string msg, int id)
-{
-	mtx.lock();
-	std::cout << msg << id << std::endl;
-	mtx.unlock();
-}*/
-
-// RAII
-
-/*void shared_print(std::string msg, int id)
-{
-	std::lock_guard<std::mutex> guard(mtx);
-	std::cout << msg << id << std::endl;
-}*/
-
 class LogFile{
 public:
 	LogFile()
@@ -34,8 +16,22 @@ public:
 	}
 	void shared_print(std::string msg, int value)
 	{
-		std::lock_guard<std::mutex> guard(mutex_);
+		// std::lock_guard<std::mutex> guard(mutex_);
+		// std::unique_lock<std::mutex> guard(mutex_);
+		std::unique_lock<std::mutex> guard(mutex_, std::defer_lock);
+
+		// do smth that doesn't require fout_
+
+		guard.lock();
 		fout_ << msg << ": " << value << std::endl;
+		guard.unlock();
+
+		// do smth that doesn't require fout_
+
+		guard.lock();
+
+		std::unique_lock<std::mutex> guard2 = std::move(guard);
+
 	}
 
 private:
