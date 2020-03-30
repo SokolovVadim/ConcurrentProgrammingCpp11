@@ -7,32 +7,30 @@
 class LogFile{
 public:
 	LogFile()
-	{}
+	{
+		fout_.open("log.txt");
+	}
 	~LogFile()
 	{
 		fout_.close();
 	}
 	void shared_print(std::string msg, int value)
-	{/*
-		if(!fout_.is_open())
-		{
-			std::unique_lock<std::mutex> guard2(mutex_open_);
-			fout_.open("log.txt");
-		}*/
-
-		// file will be opened only once by one thread
-		std::call_once(flag_, [&](){ fout_.open("log.txt"); });
-
-		std::unique_lock<std::mutex> guard(mutex_, std::defer_lock);
-		mutex_.lock();
-		fout_ << msg << ": " << value << std::endl;
-		mutex_.unlock();
+	{
+		std::lock(mutex_, mutex2_);
+		std::lock_guard<std::mutex> guard(mutex_, std::adopt_lock);
+		std::lock_guard<std::mutex> guard2(mutex2_, std::adopt_lock);
+		std::cout << msg << ": " << value << std::endl;
 	}
-
+	void shared_print2(std::string msg, int value)
+	{
+		std::lock(mutex_, mutex2_);
+		std::lock_guard<std::mutex> guard(mutex_, std::adopt_lock);
+		std::lock_guard<std::mutex> guard2(mutex2_, std::adopt_lock);
+		std::cout << msg << ": " << value << std::endl;
+	}
 private:
-	std::once_flag flag_;
-	// std::mutex    mutex_open_;
 	std::mutex     mutex_;
+	std::mutex 	   mutex2_;
 	std::ofstream  fout_;
 };
 
@@ -46,7 +44,7 @@ int main()
 	LogFile log;
 	std::thread t1(worker, std::ref(log));
 	for(int i(0); i < 100; ++i)
-		log.shared_print(std::string("From main: "), i);
+		log.shared_print2(std::string("From main: "), i);
 	t1.join();
 	return 0;
 }
